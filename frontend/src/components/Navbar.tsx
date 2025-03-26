@@ -2,10 +2,17 @@ import { useState } from "react";
 import { Link, useLocation } from "react-router-dom";
 
 const navItems = [
+ feat/RecentGameActivity
   { label: "How To Play", href: "/how-to-play" },
   { label: "Game Modes", href: "/game-modes" },
   { label: "FAQs", href: "/faqs" },
   { label: "About Us", href: "/about" },
+
+  { label: 'Game Modes', href: '/game-modes' },
+  { label: 'How To Play', href: '/how-to-play' },
+  { label: 'About Us', href: '/about' },
+  { label: 'FAQs', href: '/faqs' },
+ main
 ] as const;
 
 export default function Navbar() {

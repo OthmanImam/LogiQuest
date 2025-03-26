@@ -8,12 +8,20 @@ const Home = () => {
   return (
     <>
       {/* paste your page component below here */}
+ feat/RecentGameActivity
 
       <Navbar />
       <HeroSection />
       <WhyShouldYouPlaySection />
       <FaqsSection />
       <AboutUsSection />
+
+      <Navbar />
+      <HeroSection />
+      <WhyShouldYouPlaySection />
+      <AboutUsSection />
+      <FaqsSection />
+ main
       <Footer />
       {/* paste your page component above here */}
     </>
