@@ -1,11 +1,11 @@
-import { useState } from 'react';
-import { Link, useLocation } from 'react-router-dom';
+import { useState } from "react";
+import { Link, useLocation } from "react-router-dom";
 
 const navItems = [
-  { label: 'How To Play', href: '/how-to-play' },
-  { label: 'Game Modes', href: '/game-modes' },
-  { label: 'FAQs', href: '/faqs' },
-  { label: 'About Us', href: '/about' },
+  { label: "How To Play", href: "/how-to-play" },
+  { label: "Game Modes", href: "/game-modes" },
+  { label: "FAQs", href: "/faqs" },
+  { label: "About Us", href: "/about" },
 ] as const;
 
 export default function Navbar() {
@@ -23,7 +23,9 @@ export default function Navbar() {
               alt="LogiQuest"
               className="w-10 h-10 md:w-16 md:h-[4.4rem] mr-2"
             />
-            <span className="text-[#CFFDED] text-[2rem] font-bold">LogiQuest</span>
+            <span className="text-[#CFFDED] text-[2rem] font-bold">
+              LogiQuest
+            </span>
           </Link>
 
           {/* Desktop Navigation */}
@@ -33,7 +35,7 @@ export default function Navbar() {
                 key={item.href}
                 to={item.href}
                 className={`text-white hover:text-gray-300 font-medium text-xl transition-colors ${
-                  location.pathname === item.href ? 'font-semibold' : ''
+                  location.pathname === item.href ? "font-semibold" : ""
                 }`}
               >
                 {item.label}
@@ -70,7 +72,7 @@ export default function Navbar() {
                   key={item.href}
                   to={item.href}
                   className={`block px-3 py-2 rounded-md text-white hover:bg-[#004d43] transition-colors ${
-                    location.pathname === item.href ? 'bg-[#004d43]' : ''
+                    location.pathname === item.href ? "bg-[#004d43]" : ""
                   }`}
                   onClick={() => setIsMenuOpen(false)}
                 >
@@ -83,5 +85,4 @@ export default function Navbar() {
       </div>
     </nav>
   );
-};
-
+}

@@ -8,14 +8,13 @@ const Home = () => {
   return (
     <>
       {/* paste your page component below here */}
-       
 
-        <Navbar />
-        <HeroSection />
-         <WhyShouldYouPlaySection />
-        <FaqsSection/>
-        <AboutUsSection />
-        <Footer />
+      <Navbar />
+      <HeroSection />
+      <WhyShouldYouPlaySection />
+      <FaqsSection />
+      <AboutUsSection />
+      <Footer />
       {/* paste your page component above here */}
     </>
   );
