@@ -1,6 +1,6 @@
-import React, { useState, useRef, useEffect } from "react";
+import React, { useRef } from "react";
 
-// Dummy data for profiles
+// Dummy data for contributor profiles
 const profileData = [
   {
     id: 1,
@@ -34,7 +34,6 @@ const profileData = [
   },
 ];
 
-// Profile Card Component
 interface ProfileCardProps {
   name: string;
   title: string;
@@ -53,6 +52,7 @@ const ProfileCard: React.FC<ProfileCardProps> = ({ name, title, imageSrc }) => (
   </div>
 );
 
+ feat/RecentGameActivity
 // Slider Component
 const ProfileSlider: React.FC = () => {
   const cardWidth = 353 + 20; // Card width + gap
@@ -63,18 +63,26 @@ const ProfileSlider: React.FC = () => {
   const [isDragging, setIsDragging] = useState(false);
   const [dragStartX, setDragStartX] = useState(0);
   const [dragOffset, setDragOffset] = useState(0);
-  const containerRef = useRef<HTMLDivElement>(null);
-  const threshold = 50;
 
-  // Handle window resize
-  useEffect(() => {
-    const handleResize = () => {
-      const newVisibleCards = Math.floor(window.innerWidth / cardWidth) || 1;
-      const newMaxIndex = Math.max(0, profileData.length - newVisibleCards);
-      // Ensure current index is still valid after resize
-      if (currentIndex > newMaxIndex) {
-        setCurrentIndex(newMaxIndex);
+const ContributorsSlider: React.FC = () => {
+ main
+  const containerRef = useRef<HTMLDivElement>(null);
+  const scrollIntervalRef = useRef<NodeJS.Timeout | null>(null);
+
+  const startAutoScroll = () => {
+    if (scrollIntervalRef.current !== null) return;
+    scrollIntervalRef.current = setInterval(() => {
+      if (containerRef.current) {
+        containerRef.current.scrollLeft += 2; // Adjust speed as needed
+        // Loop back to the start when reaching the end
+        if (
+          containerRef.current.scrollLeft + containerRef.current.clientWidth >=
+          containerRef.current.scrollWidth
+        ) {
+          containerRef.current.scrollLeft = 0;
+        }
       }
+ feat/RecentGameActivity
     };
 
     window.addEventListener("resize", handleResize);
@@ -129,6 +137,16 @@ const ProfileSlider: React.FC = () => {
     }
 
     return transform;
+
+    }, 20);
+  };
+
+  const stopAutoScroll = () => {
+    if (scrollIntervalRef.current) {
+      clearInterval(scrollIntervalRef.current);
+      scrollIntervalRef.current = null;
+    }
+ main
   };
 
   return (
@@ -136,6 +154,7 @@ const ProfileSlider: React.FC = () => {
       <div
         className="w-full h-[615px] overflow-hidden relative"
         ref={containerRef}
+ feat/RecentGameActivity
       >
         <main
           className={`h-full flex ${isDragging ? "cursor-grabbing" : "cursor-grab"}`}
@@ -159,9 +178,26 @@ const ProfileSlider: React.FC = () => {
             ))}
           </div>
         </main>
+
+        onMouseEnter={startAutoScroll}
+        onMouseLeave={stopAutoScroll}
+      >
+        <div
+          className="flex h-full gap-5"
+          style={{ scrollBehavior: "smooth", whiteSpace: "nowrap" }}
+        >
+          {profileData.map((profile) => (
+            <ProfileCard key={profile.id} {...profile} />
+          ))}
+        </div>
+ main
       </div>
     </section>
   );
 };
 
+ feat/RecentGameActivity
 export default ProfileSlider;
+
+export default ContributorsSlider;
+ main
