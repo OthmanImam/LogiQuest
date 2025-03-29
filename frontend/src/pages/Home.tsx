@@ -10,6 +10,7 @@ import ProfileForm from "../components/ProfileForm";
 
 const Home = () => {
  feat/RecentGameActivity
+ feat/RecentGameActivity
   return (
     <>
       {/* paste your page component below here */}
@@ -31,6 +32,8 @@ const Home = () => {
       {/* paste your page component above here */}
     </>
   );
+
+ main
 
 	return (
 		<>
