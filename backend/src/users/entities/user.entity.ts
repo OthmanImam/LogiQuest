@@ -7,6 +7,7 @@ import {
   UpdateDateColumn,
   OneToMany,
 } from 'typeorm';
+
 import { ApiProperty } from '@nestjs/swagger';
 
 @Entity()
@@ -36,7 +37,24 @@ export class User {
 
   @ApiProperty({ example: '0x1234abcd...', description: 'User wallet address', nullable: true })
   @Column({ nullable: true })
+  displayName: string;
+
+  @Column({ nullable: true })
+  bio: string;
+
+  @Column({ nullable: true })
+  avatarUrl: string;
+
+  @Column({ 
+    type: 'enum',
+    enum: ['public', 'private', 'friends'],
+    default: 'public'
+  })
+  profileVisibility: string;
+
+  @Column({ nullable: true })
   walletAddress: string;
+
 
   @ApiProperty({ example: '2025-03-27T12:00:00.000Z', description: 'Timestamp when the user was created' })
   @Column({ default: 0 })

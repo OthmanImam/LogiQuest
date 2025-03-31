@@ -1,14 +1,20 @@
 import {
   Controller,
   Get,
-  Patch,
-  Body,
-  UseGuards,
-  Param,
-  Delete,
   Post,
+  Body,
+  Patch,
+  UseInterceptors,
+  UploadedFile,
+  UseGuards,
+  Request,
 } from '@nestjs/common';
+import { FileInterceptor } from '@nestjs/platform-express';
+import { ApiTags, ApiBearerAuth, ApiOperation } from '@nestjs/swagger';
 import { UsersService } from './users.service';
+import { diskStorage } from 'multer';
+import { extname } from 'path';
+import { MulterFile } from 'src/common/types/multer.types';
 import { AuthGuard } from '@nestjs/passport';
 import { UpdateProfileDto } from './dto/update-profile-dto.dto';
 import { ReqUser } from 'src/auth/common/decorator/get-user.decorator';
@@ -23,11 +29,20 @@ import {
 import { ProgressTrackingService } from '../progress/progess-tracking.service';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 
-@ApiTags('Users') // Groups this controller under "Users" in Swagger
+@ApiTags('Users')
 @Controller('api/users')
 export class UserController {
   constructor(
     private readonly usersService: UsersService,
+    private readonly progressTrackingService: ProgressTrackingService,
+  ) {}
+
+  @UseGuards(JwtAuthGuard)
+  @Get('me/profile')
+  @ApiOperation({ summary: 'Get current user profile' })
+  @ApiBearerAuth()
+  async getProfile(@Request() req) {
+    return this.usersService.getProfile(req.user.id);
     private readonly progressTrackingServices: ProgressTrackingService,
   ) {}
 
@@ -66,9 +81,11 @@ export class UserController {
     return this.usersService.updateProfile(user.id, dto);
   }
 
-  @UseGuards(AuthGuard('jwt'))
-  @Patch('change-password')
+  @UseGuards(JwtAuthGuard)
+  @Patch('me/profile')
+  @ApiOperation({ summary: 'Update current user profile' })
   @ApiBearerAuth()
+
   @ApiOperation({ summary: 'Change user password' })
   @ApiResponse({ status: 200, description: 'Password changed successfully' })
   @ApiResponse({ status: 400, description: 'Invalid input data' })
@@ -77,8 +94,9 @@ export class UserController {
     return this.usersService.changePassword(user.id, dto);
   }
 
-  @UseGuards(AuthGuard('jwt'))
-  @Delete('deactivate')
+  @UseGuards(JwtAuthGuard)
+  @Post('me/avatar')
+  @ApiOperation({ summary: 'Upload user avatar' })
   @ApiBearerAuth()
   @ApiOperation({ summary: 'Deactivate user account' })
   @ApiResponse({ status: 200, description: 'Account deactivated successfully' })
