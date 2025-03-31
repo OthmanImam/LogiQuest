@@ -17,9 +17,10 @@
     "react-dom": "^19.0.0",
     "react-router": "^7.1.5",
     "react-router-dom": "^6.29.0",
-    "zod": "^3.24.2"
     "react-scroll": "^1.9.3",
-    "react-toastify": "^11.0.5"
+    "react-toastify": "^11.0.5",
+    "styled-components": "^6.1.16",
+    "zod": "^3.24.2"
   },
   "devDependencies": {
     "@eslint/js": "^9.19.0",

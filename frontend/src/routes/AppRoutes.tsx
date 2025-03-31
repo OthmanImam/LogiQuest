@@ -1,13 +1,13 @@
 // routes/AppRoutes.jsx  
-import { createBrowserRouter, Outlet } from "react-router-dom"
-import Layout from "../layout/Layout"
-// import PrivateRoutes from './PrivateRoutes'
-import NotFound from "../pages/NotFound"
-import UnauthorizedResource from "../pages/UnauthorizedResource"
-import Home from '../pages/Home'
-import LeaderboardPage from "../pages/LeaderboardPage" // Import the LeaderboardPage component
-// import ProtectedRoutes from "./ProtectedRoutes"
-// import Account from "../pages/Account"
+import { createBrowserRouter, Outlet } from "react-router-dom";
+import Layout from "../layout/Layout";
+// import PrivateRoutes from './PrivateRoutes';
+import NotFound from "../pages/NotFound";
+import UnauthorizedResource from "../pages/UnauthorizedResource";
+import Home from '../pages/Home';
+import LeaderboardPage from "../pages/LeaderboardPage"; // Import the LeaderboardPage component
+// import ProtectedRoutes from "./ProtectedRoutes";
+// import Account from "../pages/Account";
 import GameModesPage from "../pages/GameModesPage";
 import Login from "../pages/Login";
 
@@ -15,11 +15,11 @@ const router = createBrowserRouter([
     // /post/new -> add new post (protected, admin layout)
     {
         path: '/*',
-        element: <NotFound />
+        element: <NotFound />,
     },
     {
         path: '/unauthorized',
-        element: <UnauthorizedResource />
+        element: <UnauthorizedResource />,
     },
     {
         path: "/sign-in",
@@ -31,15 +31,15 @@ const router = createBrowserRouter([
         children: [
             {
                 index: true,
-                element: <Home />
+                element: <Home />,
             },
             {
                 path: 'leaderboard',
-                element: <LeaderboardPage />
+                element: <LeaderboardPage />,
             },
-           {
-              path: "game-modes",
-              element: <GameModesPage />,
+            {
+                path: "game-modes",
+                element: <GameModesPage />,
             },
             // {
             //     element: <PrivateRoutes />,
@@ -59,7 +59,8 @@ const router = createBrowserRouter([
             //         }
             //     ]
             // },
-        ]
+        ],
     },
+]);
 
 export default router;
