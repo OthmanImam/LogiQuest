@@ -1,4 +1,4 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { ForbiddenException, Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { CreateUserDto } from './dto/create-user.dto';
@@ -7,8 +7,8 @@ import { User } from './entities/user.entity';
 import { UserResponseDto } from './dto/user-response.dto';
 import { ProfileResponseDto } from './dto/profile-response.dto';
 import { plainToClass } from 'class-transformer';
-import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import * as bcrypt from 'bcrypt';
+import { ChangePasswordDto } from './dto/change-password.dto';
 
 @Injectable()
 export class UsersService {
@@ -78,6 +78,12 @@ export class UsersService {
       userQuizzes: [], // Default empty array for userQuizzes
       role: 'user', // Default role as 'user'
       isActive: true, // Default isActive to true
+      displayName: createUserDto.username || '',
+      bio: '',
+      avatarUrl: '',
+      profileVisibility: 'public',
+      createdAt: new Date(),
+      updatedAt: new Date()
     };
     const user = this.usersRepository.create(newUser);
     this.usersRepository.save(user);

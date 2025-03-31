@@ -59,6 +59,31 @@ cd logicquest
 - Ensure all tests pass.
 - Request reviews from maintainers, when you submit a PR.
 
+## Starknet Development Setup
+
+For Starknet integration, contributors need to:
+
+1. Create an Alchemy account and set up a Starknet Goerli (testnet) app
+2. Generate a test wallet for development (never use real wallets with funds)
+3. Copy the API key and wallet information to your .env file
+
+### Generating a test wallet
+
+You can generate a test wallet using:
+- Argent X browser extension (switch to testnet)
+- Braavos wallet (switch to testnet)
+- Programmatically using starknet.js (see documentation)
+
+## Generating Starknet Test Keys
+
+To generate a Starknet private key and address for development:
+
+```bash
+npm run generate-starknet-key
+```
+This approach provides a convenient way for contributors to generate test keys without having to write code themselves, and keeps the key generation separate from your main application code.
+
+Note: Always use testnet for development and never commit private keys to the repository.
 
 
 

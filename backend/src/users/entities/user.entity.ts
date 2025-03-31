@@ -7,19 +7,13 @@ import {
   UpdateDateColumn,
   OneToMany,
 } from 'typeorm';
-
+import { Score } from '../../leaderboards/entities/score.entity';
+import { UserQuiz } from 'src/quiz/entities/user-quiz.entity';
 import { ApiProperty } from '@nestjs/swagger';
 
 @Entity()
 export class User {
   @ApiProperty({ example: 1, description: 'Unique identifier for the user' })
-  @PrimaryGeneratedColumn()
-  id: number;
-import { Score } from '../../leaderboards/entities/score.entity';
-import { UserQuiz } from 'src/quiz/entities/user-quiz.entity';
-
-@Entity()
-export class User {
   @PrimaryGeneratedColumn()
   id: number;
 

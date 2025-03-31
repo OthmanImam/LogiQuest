@@ -155,7 +155,6 @@ export class GameSession {
     example: 3.5,
   })
   averageResponseTime: number;
-  averageResponseTime: number
 
   // // New fields
   // @Column()
