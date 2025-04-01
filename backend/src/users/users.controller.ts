@@ -8,15 +8,16 @@ import {
   UploadedFile,
   UseGuards,
   Request,
+  Param,
+  Delete,
 } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
-import { ApiTags, ApiBearerAuth, ApiOperation } from '@nestjs/swagger';
 import { UsersService } from './users.service';
 import { diskStorage } from 'multer';
 import { extname } from 'path';
 import { MulterFile } from 'src/common/types/multer.types';
 import { AuthGuard } from '@nestjs/passport';
-import { UpdateProfileDto } from './dto/update-profile-dto.dto';
+import { UpdateProfileDto } from './dto/update-profile.dto';
 import { ReqUser } from 'src/auth/common/decorator/get-user.decorator';
 import { ChangePasswordDto } from './dto/change-password.dto';
 import { CreateUserDto } from './dto/create-user.dto';
@@ -37,26 +38,9 @@ export class UserController {
     private readonly progressTrackingService: ProgressTrackingService,
   ) {}
 
-  @UseGuards(JwtAuthGuard)
-  @Get('me/profile')
-  @ApiOperation({ summary: 'Get current user profile' })
-  @ApiBearerAuth()
-  async getProfile(@Request() req) {
-    return this.usersService.getProfile(req.user.id);
-    private readonly progressTrackingServices: ProgressTrackingService,
-  ) {}
-
-  @Post()
-  @ApiOperation({ summary: 'Create a new user' })
-  @ApiResponse({ status: 201, description: 'User created successfully' })
-  @ApiResponse({ status: 400, description: 'Invalid input data' })
-  async createUser(@Body() createUserDto: CreateUserDto) {
-    return this.usersService.createUser(createUserDto);
-  }
-
-  // @UseGuards(AuthGuard('jwt'))
+  @UseGuards(AuthGuard('jwt'))
   @Get('profile')
-  // @ApiBearerAuth() // Requires JWT authentication
+  @ApiBearerAuth() // Requires JWT authentication
   @UseGuards(JwtAuthGuard)
   @ApiOperation({ summary: 'Get authenticated user profile' })
   @ApiResponse({
@@ -135,7 +119,7 @@ export class UserController {
     description: 'Returns overall user progress statistics',
   })
   async getTrackingUserProgress(@Param('me') me: string) {
-    return this.progressTrackingServices.getUserProgress(me);
+    return this.progressTrackingService.getUserProgress(me);
   }
 
   @Get('me/categories/progress')
@@ -145,6 +129,6 @@ export class UserController {
     description: 'Returns progress statistics for each category',
   })
   async getCategoryProgress(userId: string) {
-    return this.progressTrackingServices.getCategoryProgress(userId);
+    return this.progressTrackingService.getCategoryProgress(userId);
   }
 }

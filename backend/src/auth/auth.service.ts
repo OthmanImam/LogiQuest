@@ -23,7 +23,6 @@ export class AuthService {
     @Inject(forwardRef(() => UsersService))
     private readonly usersService: UsersService, // Ensure this service is properly injected
     private readonly configService: ConfigService,
-    // private jwtService: JwtService,
   ) {}
 
   async register(registerDto: CreateUserDto): Promise<RegisterDto> {
