@@ -38,26 +38,9 @@ export class UserController {
     private readonly progressTrackingService: ProgressTrackingService,
   ) {}
 
-  // REVIEW
-  // @UseGuards(JwtAuthGuard)
-  // @Get('me/profile')
-  // @ApiOperation({ summary: 'Get current user profile' })
-  // @ApiBearerAuth()
-  // async getProfile(@Request() req) {
-  //   return this.usersService.getProfile(req.user.id);
-  // }
-
-  // @Post()
-  // @ApiOperation({ summary: 'Create a new user' })
-  // @ApiResponse({ status: 201, description: 'User created successfully' })
-  // @ApiResponse({ status: 400, description: 'Invalid input data' })
-  // async createUser(@Body() createUserDto: CreateUserDto) {
-  //   return this.usersService.createUser(createUserDto);
-  // }
-
-  // @UseGuards(AuthGuard('jwt'))
+  @UseGuards(AuthGuard('jwt'))
   @Get('profile')
-  // @ApiBearerAuth() // Requires JWT authentication
+  @ApiBearerAuth() // Requires JWT authentication
   @UseGuards(JwtAuthGuard)
   @ApiOperation({ summary: 'Get authenticated user profile' })
   @ApiResponse({

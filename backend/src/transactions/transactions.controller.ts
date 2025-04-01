@@ -11,10 +11,10 @@ import {
 } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
 import { ApiTags, ApiOperation, ApiResponse, ApiParam, ApiBearerAuth } from '@nestjs/swagger';
-import type { TransactionsService } from './transactions.service';
-import type { CreateTransactionDto } from './dto/create-transaction.dto';
-import type { UpdateTransactionDto } from './dto/update-transaction.dto';
-import type { QueryTransactionDto } from './dto/query-transaction.dto';
+import { TransactionsService } from './transactions.service';
+import { CreateTransactionDto } from './dto/create-transaction.dto';
+import { UpdateTransactionDto } from './dto/update-transaction.dto';
+import { QueryTransactionDto } from './dto/query-transaction.dto';
 
 @ApiTags('Transactions')
 @Controller('transactions')

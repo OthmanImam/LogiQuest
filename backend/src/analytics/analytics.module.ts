@@ -6,13 +6,14 @@ import { Quiz } from "../quiz/entities/quiz.entity"
 import { UserQuiz } from "../quiz/entities/user-quiz.entity"
 import { User } from "src/users/entities/user.entity"
 import { UsersModule } from "src/users/users.module"
-import { RolesGuard } from "src/auth/guards/roles.guard"
 
 @Module({
   imports: [TypeOrmModule.forFeature([Quiz, User, UserQuiz]), forwardRef(() => UsersModule)],
-  providers: [AnalyticsService, RolesGuard],
+  providers: [AnalyticsService,
+  ],
   controllers: [AnalyticsController],
-  exports: [RolesGuard]
+  exports: [
+  ]
 })
 export class AnalyticsModule {}
 
