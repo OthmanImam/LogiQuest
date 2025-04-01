@@ -1,8 +1,8 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import type { Repository } from 'typeorm';
+import { Repository } from 'typeorm';
 import { Puzzle } from '../puzzles/entities/puzzle.entity';
-import type { PuzzleDifficulty } from '../puzzles/entities/puzzle.entity';
+import { PuzzleDifficulty } from '../puzzles/entities/puzzle.entity';
 
 @Injectable()
 export class CategoryService {

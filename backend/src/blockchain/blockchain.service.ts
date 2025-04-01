@@ -1,248 +1,275 @@
-// import { Injectable, Logger } from '@nestjs/common';
-// import { TransactionsService } from '../transactions/transactions.service';
-// import {
-//   Transaction,
-//   TransactionStatus,
-//   TransactionType,
-// } from '../transactions/entities/transactions.entity';
-// import { ethers } from 'ethers';
-// import { ConfigService } from '@nestjs/config';
+import { Injectable, Logger } from '@nestjs/common';
+import { TransactionsService } from '../transactions/transactions.service';
+import {
+  Transaction,
+  TransactionStatus,
+  TransactionType,
+} from '../transactions/entities/transactions.entity';
+import { ethers } from 'ethers';
+import { ConfigService } from '@nestjs/config';
 
-// @Injectable()
-// export class BlockchainService {
-//   private readonly logger = new Logger(BlockchainService.name);
-//   private provider: ethers.Provider;
-//   private wallet: ethers.Wallet;
+@Injectable()
+export class BlockchainService {
+  private readonly logger = new Logger(BlockchainService.name);
+  private provider: ethers.Provider;
+  private wallet: ethers.Wallet;
 
-//   constructor(
-//     private readonly transactionsService: TransactionsService,
-//     private readonly configService: ConfigService,
-//   ) {
-//     // Initialize provider and wallet
-//     this.initializeBlockchain();
-//   }
+  constructor(
+    private readonly transactionsService: TransactionsService,
+    private readonly configService: ConfigService,
+  ) {
+    // Initialize provider and wallet
+    this.initializeBlockchain();
+  }
 
-//   private initializeBlockchain() {
-//     const rpcUrl = this.configService.get<string>('BLOCKCHAIN_RPC_URL');
-//     const privateKey = this.configService.get<string>('BLOCKCHAIN_PRIVATE_KEY');
+private initializeBlockchain() {
+  try {
+    const rpcUrl = this.configService.get<string>('BLOCKCHAIN_RPC_URL');
+    const privateKey = this.configService.get<string>('BLOCKCHAIN_PRIVATE_KEY');
 
-//     this.provider = new ethers.JsonRpcProvider(rpcUrl);
-//     this.wallet = new ethers.Wallet(privateKey, this.provider);
+    // Check if config values are provided
+    if (!rpcUrl || !privateKey) {
+      this.logger.warn('Blockchain configuration missing. Using mock implementation.');
+      this.setupMockBlockchain();
+      return;
+    }
 
-//     this.logger.log('Blockchain service initialized');
-//   }
+    // Try to create real provider and wallet
+    this.provider = new ethers.JsonRpcProvider(rpcUrl);
+    this.wallet = new ethers.Wallet(privateKey, this.provider);
+    this.logger.log('Blockchain service initialized with real implementation');
+  } catch (error) {
+    this.logger.warn(`Failed to initialize blockchain with real implementation: ${error.message}`);
+    this.setupMockBlockchain();
+  }
+}
 
-//   async sendNFTReward(
-//     userId: string,
-//     tokenId: string,
-//     contractAddress: string,
-//     metadata: any,
-//   ): Promise<Transaction> {
-//     // Create a pending transaction record
-//     const transaction = await this.transactionsService.create({
-//       type: TransactionType.NFT,
-//       status: TransactionStatus.PENDING,
-//       userId,
-//       tokenId,
-//       contractAddress,
-//       metadata,
-//     });
+private setupMockBlockchain() {
+  // Create mock provider and wallet for development
+  this.provider = {
+    getTransaction: async () => ({ blockNumber: 1 }),
+    getTransactionReceipt: async () => ({ status: 1 }),
+  } as any;
 
-//     try {
-//       // Load NFT contract
-//       const nftContract = new ethers.Contract(
-//         contractAddress,
-//         [
-//           'function safeTransferFrom(address from, address to, uint256 tokenId)',
-//         ],
-//         this.wallet,
-//       );
+  this.wallet = {
+    address: '0xMockWalletAddress',
+    connect: () => this.wallet,
+  } as any;
 
-//       // Get user's wallet address from metadata or other source
-//       const userWalletAddress = metadata.walletAddress;
+  this.logger.log('Blockchain service initialized with mock implementation');
+}
 
-//       // Send the NFT
-//       const tx = await nftContract.safeTransferFrom(
-//         this.wallet.address,
-//         userWalletAddress,
-//         tokenId,
-//       );
+  async sendNFTReward(
+    userId: string,
+    tokenId: string,
+    contractAddress: string,
+    metadata: any,
+  ): Promise<Transaction> {
+    // Create a pending transaction record
+    const transaction = await this.transactionsService.create({
+      type: TransactionType.NFT,
+      status: TransactionStatus.PENDING,
+      userId,
+      tokenId,
+      contractAddress,
+      metadata,
+    });
 
-//       // Update transaction with pending tx hash
-//       await this.transactionsService.update(transaction.id, {
-//         txHash: tx.hash,
-//         status: TransactionStatus.PROCESSING,
-//       });
+    try {
+      // Load NFT contract
+      const nftContract = new ethers.Contract(
+        contractAddress,
+        [
+          'function safeTransferFrom(address from, address to, uint256 tokenId)',
+        ],
+        this.wallet,
+      );
 
-//       // Wait for transaction to be mined
-//       const receipt = await tx.wait();
+      // Get user's wallet address from metadata or other source
+      const userWalletAddress = metadata.walletAddress;
 
-//       // Update transaction with confirmed details
-//       return this.transactionsService.update(transaction.id, {
-//         status: TransactionStatus.COMPLETED,
-//         blockNumber: receipt.blockNumber,
-//       });
-//     } catch (error) {
-//       this.logger.error(
-//         `Failed to send NFT reward: ${error.message}`,
-//         error.stack,
-//       );
+      // Send the NFT
+      const tx = await nftContract.safeTransferFrom(
+        this.wallet.address,
+        userWalletAddress,
+        tokenId,
+      );
 
-//       // Update transaction as failed
-//       await this.transactionsService.update(transaction.id, {
-//         status: TransactionStatus.FAILED,
-//         metadata: {
-//           ...transaction.metadata,
-//           error: error.message,
-//         },
-//       });
+      // Update transaction with pending tx hash
+      await this.transactionsService.update(transaction.id, {
+        txHash: tx.hash,
+        status: TransactionStatus.PROCESSING,
+      });
 
-//       throw error;
-//     }
-//   }
+      // Wait for transaction to be mined
+      const receipt = await tx.wait();
 
-//   async sendTokenReward(
-//     userId: string,
-//     amount: string,
-//     contractAddress: string,
-//     metadata: any,
-//   ): Promise<Transaction> {
-//     // Create a pending transaction record
-//     const transaction = await this.transactionsService.create({
-//       type: TransactionType.TOKEN,
-//       status: TransactionStatus.PENDING,
-//       userId,
-//       amount,
-//       contractAddress,
-//       metadata,
-//     });
+      // Update transaction with confirmed details
+      return this.transactionsService.update(transaction.id, {
+        status: TransactionStatus.COMPLETED,
+        blockNumber: receipt.blockNumber,
+      });
+    } catch (error) {
+      this.logger.error(
+        `Failed to send NFT reward: ${error.message}`,
+        error.stack,
+      );
 
-//     try {
-//       // Load token contract
-//       const tokenContract = new ethers.Contract(
-//         contractAddress,
-//         ['function transfer(address to, uint256 amount) returns (bool)'],
-//         this.wallet,
-//       );
+      // Update transaction as failed
+      await this.transactionsService.update(transaction.id, {
+        status: TransactionStatus.FAILED,
+        metadata: {
+          ...transaction.metadata,
+          error: error.message,
+        },
+      });
 
-//       // Get user's wallet address from metadata or other source
-//       const userWalletAddress = metadata.walletAddress;
+      throw error;
+    }
+  }
 
-//       // Send the tokens
-//       const tx = await tokenContract.transfer(
-//         userWalletAddress,
-//         ethers.parseUnits(amount, 18), // Assuming 18 decimals for STRK token
-//       );
+  async sendTokenReward(
+    userId: string,
+    amount: string,
+    contractAddress: string,
+    metadata: any,
+  ): Promise<Transaction> {
+    // Create a pending transaction record
+    const transaction = await this.transactionsService.create({
+      type: TransactionType.TOKEN,
+      status: TransactionStatus.PENDING,
+      userId,
+      amount,
+      contractAddress,
+      metadata,
+    });
 
-//       // Update transaction with pending tx hash
-//       await this.transactionsService.update(transaction.id, {
-//         txHash: tx.hash,
-//         status: TransactionStatus.PROCESSING,
-//       });
+    try {
+      // Load token contract
+      const tokenContract = new ethers.Contract(
+        contractAddress,
+        ['function transfer(address to, uint256 amount) returns (bool)'],
+        this.wallet,
+      );
 
-//       // Wait for transaction to be mined
-//       const receipt = await tx.wait();
+      // Get user's wallet address from metadata or other source
+      const userWalletAddress = metadata.walletAddress;
 
-//       // Update transaction with confirmed details
-//       return this.transactionsService.update(transaction.id, {
-//         status: TransactionStatus.COMPLETED,
-//         blockNumber: receipt.blockNumber,
-//       });
-//     } catch (error) {
-//       this.logger.error(
-//         `Failed to send token reward: ${error.message}`,
-//         error.stack,
-//       );
+      // Send the tokens
+      const tx = await tokenContract.transfer(
+        userWalletAddress,
+        ethers.parseUnits(amount, 18), // Assuming 18 decimals for STRK token
+      );
 
-//       // Update transaction as failed
-//       await this.transactionsService.update(transaction.id, {
-//         status: TransactionStatus.FAILED,
-//         metadata: {
-//           ...transaction.metadata,
-//           error: error.message,
-//         },
-//       });
+      // Update transaction with pending tx hash
+      await this.transactionsService.update(transaction.id, {
+        txHash: tx.hash,
+        status: TransactionStatus.PROCESSING,
+      });
 
-//       throw error;
-//     }
-//   }
+      // Wait for transaction to be mined
+      const receipt = await tx.wait();
 
-//   async trackAchievement(
-//     userId: string,
-//     achievementId: string,
-//     metadata: any,
-//   ): Promise<Transaction> {
-//     // Create a transaction record for achievement
-//     return this.transactionsService.create({
-//       type: TransactionType.ACHIEVEMENT,
-//       status: TransactionStatus.COMPLETED, // No blockchain interaction needed
-//       userId,
-//       metadata: {
-//         achievementId,
-//         ...metadata,
-//       },
-//     });
-//   }
+      // Update transaction with confirmed details
+      return this.transactionsService.update(transaction.id, {
+        status: TransactionStatus.COMPLETED,
+        blockNumber: receipt.blockNumber,
+      });
+    } catch (error) {
+      this.logger.error(
+        `Failed to send token reward: ${error.message}`,
+        error.stack,
+      );
 
-//   async getTransactionStatus(txHash: string): Promise<TransactionStatus> {
-//     try {
-//       const tx = await this.provider.getTransaction(txHash);
+      // Update transaction as failed
+      await this.transactionsService.update(transaction.id, {
+        status: TransactionStatus.FAILED,
+        metadata: {
+          ...transaction.metadata,
+          error: error.message,
+        },
+      });
 
-//       if (!tx) {
-//         return TransactionStatus.PENDING;
-//       }
+      throw error;
+    }
+  }
 
-//       if (!tx.blockNumber) {
-//         return TransactionStatus.PROCESSING;
-//       }
+  async trackAchievement(
+    userId: string,
+    achievementId: string,
+    metadata: any,
+  ): Promise<Transaction> {
+    // Create a transaction record for achievement
+    return this.transactionsService.create({
+      type: TransactionType.ACHIEVEMENT,
+      status: TransactionStatus.COMPLETED, // No blockchain interaction needed
+      userId,
+      metadata: {
+        achievementId,
+        ...metadata,
+      },
+    });
+  }
 
-//       const receipt = await this.provider.getTransactionReceipt(txHash);
+  async getTransactionStatus(txHash: string): Promise<TransactionStatus> {
+    try {
+      const tx = await this.provider.getTransaction(txHash);
 
-//       if (receipt && receipt.status === 1) {
-//         return TransactionStatus.COMPLETED;
-//       } else {
-//         return TransactionStatus.FAILED;
-//       }
-//     } catch (error) {
-//       this.logger.error(
-//         `Failed to get transaction status: ${error.message}`,
-//         error.stack,
-//       );
-//       throw error;
-//     }
-//   }
+      if (!tx) {
+        return TransactionStatus.PENDING;
+      }
 
-//   async syncTransactionStatuses(): Promise<void> {
-//     try {
-//       // Get all pending or processing transactions
-//       const pendingTransactions = await this.transactionsService.findAll({
-//         status: TransactionStatus.PROCESSING,
-//       });
+      if (!tx.blockNumber) {
+        return TransactionStatus.PROCESSING;
+      }
 
-//       for (const transaction of pendingTransactions) {
-//         if (!transaction.txHash) continue;
+      const receipt = await this.provider.getTransactionReceipt(txHash);
 
-//         const currentStatus = await this.getTransactionStatus(
-//           transaction.txHash,
-//         );
+      if (receipt && receipt.status === 1) {
+        return TransactionStatus.COMPLETED;
+      } else {
+        return TransactionStatus.FAILED;
+      }
+    } catch (error) {
+      this.logger.error(
+        `Failed to get transaction status: ${error.message}`,
+        error.stack,
+      );
+      throw error;
+    }
+  }
 
-//         if (currentStatus !== transaction.status) {
-//           await this.transactionsService.updateTransactionStatus(
-//             transaction.id,
-//             currentStatus,
-//           );
+  async syncTransactionStatuses(): Promise<void> {
+    try {
+      // Get all pending or processing transactions
+      const pendingTransactions = await this.transactionsService.findAll({
+        status: TransactionStatus.PROCESSING,
+      });
 
-//           this.logger.log(
-//             `Updated transaction ${transaction.id} status from ${transaction.status} to ${currentStatus}`,
-//           );
-//         }
-//       }
-//     } catch (error) {
-//       this.logger.error(
-//         `Failed to sync transaction statuses: ${error.message}`,
-//         error.stack,
-//       );
-//       throw error;
-//     }
-//   }
-// }
+      for (const transaction of pendingTransactions) {
+        if (!transaction.txHash) continue;
+
+        const currentStatus = await this.getTransactionStatus(
+          transaction.txHash,
+        );
+
+        if (currentStatus !== transaction.status) {
+          await this.transactionsService.updateTransactionStatus(
+            transaction.id,
+            currentStatus,
+          );
+
+          this.logger.log(
+            `Updated transaction ${transaction.id} status from ${transaction.status} to ${currentStatus}`,
+          );
+        }
+      }
+    } catch (error) {
+      this.logger.error(
+        `Failed to sync transaction statuses: ${error.message}`,
+        error.stack,
+      );
+      throw error;
+    }
+  }
+}

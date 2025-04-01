@@ -6,12 +6,14 @@ import { User } from './entities/user.entity';
 import { UserController } from './users.controller';
 import { ProgressModule } from '../progress/progress.module';
 import { JwtModule } from '@nestjs/jwt';
+import { QuizModule } from '../quiz/quiz.module';
 
 @Module({
   imports: [
     forwardRef(() => AuthModule),
     TypeOrmModule.forFeature([User]),
     forwardRef(() => ProgressModule),
+    forwardRef(() => QuizModule),
     JwtModule.register({
       secret: process.env.JWT_SECRET,
       signOptions: { expiresIn: '15m' },

@@ -1,9 +1,9 @@
 import { Controller, Get, UseGuards, Post, Body } from "@nestjs/common"
 import { AuthGuard } from "@nestjs/passport"
 import { ApiTags, ApiOperation, ApiResponse, ApiBearerAuth } from "@nestjs/swagger"
-import type { AdminService } from "./admin.service"
+import { AdminService } from "./admin.service"
 import { RolesGuard } from "../auth/guards/roles.guard"
-import type { LoginDto } from "./dto/login.dto"
+import { LoginDto } from "./dto/login.dto"
 import { Roles } from "src/auth/common/decorator/roles.decorator"
 
 @ApiTags("Admin")
