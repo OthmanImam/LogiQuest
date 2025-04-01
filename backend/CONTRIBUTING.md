@@ -46,8 +46,37 @@ cd logicquest
    ```bash
    git push origin feature-name
    ```
+### 7 Dependency Management - Dependency Locking
 
-### 7. Submit a Pull Request that properly describes your changes
+
+We use strict dependency locking to ensure consistent builds across all environments.
+
+- **Never** run `npm install` to add packages. Instead, use:
+  ```bash
+  npm install <package-name> --save-exact
+  ```
+- **Always** commit the `package-lock.json` file along with your changes.
+- When pulling from the repository, use `npm ci` instead of `npm install` to ensure exact dependency versions are installed.
+- If you encounter dependency conflicts, do not use `--force` or `--legacy-peer-deps` without discussing with the team first.
+
+### Version Management
+- Major version updates (e.g., NestJS 10.x to 11.x) should be planned and coordinated with the team.
+- Ensure all related packages use compatible versions. For example:
+   - All NestJS packages should use the same major version
+   - Starknet and related packages should use compatible versions
+
+### Before Submitting a PR
+- Run `npm ls --json > /dev/null` to verify dependency tree integrity
+- Run `npm audit` to check for security vulnerabilities
+- Make sure your code works with the locked dependencies
+
+```
+Copy
+```
+
+You can expand or modify this based on your team's specific needs and practices.
+
+### 8. Submit a Pull Request that properly describes your changes
 
 
 ## Code of Conduct
