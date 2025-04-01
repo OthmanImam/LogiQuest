@@ -1,12 +1,12 @@
 
 import { createBrowserRouter, Outlet } from "react-router-dom"
-import Layout from "../layout/Layout"
+// import Layout from "../layout/Layout"
 // import ProtectedRoutes from "./ProtectedRoutes"
 // import Account from "../pages/Account"
-import NotFound from "../pages/NotFound"
-import UnauthorizedResource from "../pages/UnauthorizedResource"
+// import NotFound from "../pages/NotFound"
+// import UnauthorizedResource from "../pages/UnauthorizedResource"
 import SignIn from "../pages/SignIn";
-import Home from '../pages/Home'
+// import Home from '../pages/Home'
 import GameModes from "../pages/GameModes";
 import GameActivity from "../pages/GameActivity"
 import Dashboard from "../pages/Dashboard"
@@ -32,10 +32,10 @@ const router = createBrowserRouter([
     path: '/app',
     element: <Layout><Outlet /></Layout>,
     children: [
-      {
-        index: true,
-        element: <Home />   //default mode
-      },
+      // {
+      //   index: true,
+      //   element: <Home />   //default mode
+      // },
       {
         path: "get-started",
         element: <GameModes />,
